@@ -15,10 +15,10 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	http.Handle("/", http.FileServer(http.FS(fsys)))
+	http.Handle("/url-decoder/", http.StripPrefix("/url-decoder/", http.FileServer(http.FS(fsys))))
 
-	log.Println("listening on http://localhost:8080")
-	err = http.ListenAndServe(":8080", nil)
+	log.Println("listening on http://localhost:8123")
+	err = http.ListenAndServe(":8123", nil)
 	if err != nil {
 		log.Fatal(err)
 	}
