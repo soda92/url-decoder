@@ -1,85 +1,98 @@
-<script setup lang="ts">
-import { RouterLink, RouterView } from 'vue-router'
-import HelloWorld from './components/HelloWorld.vue'
-</script>
-
 <template>
-  <header>
-    <img alt="Vue logo" class="logo" src="@/assets/logo.svg" width="125" height="125" />
-
-    <div class="wrapper">
-      <HelloWorld msg="You did it!" />
-
-      <nav>
-        <RouterLink to="/">Home</RouterLink>
-        <RouterLink to="/about">About</RouterLink>
-      </nav>
-    </div>
-  </header>
-
-  <RouterView />
+  <div id="app">
+    <h1>WWW Form URL Encoded Decoder</h1>
+    <textarea v-model="encodedData" placeholder="Enter www-form-urlencoded data here"></textarea>
+    <input type="text" v-model="searchTerm" placeholder="Search by field name" />
+    <table>
+      <thead>
+        <tr>
+          <th>Field Name</th>
+          <th>Value</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="(item, index) in filteredDecodedData" :key="index">
+          <td>{{ item.key }}</td>
+          <td>{{ item.value }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
 </template>
 
+<script setup lang="ts">
+import { ref, computed } from 'vue';
+
+const encodedData = ref('');
+const searchTerm = ref('');
+
+const decodedData = computed(() => {
+  if (!encodedData.value) {
+    return [];
+  }
+  try {
+    const searchParams = new URLSearchParams(encodedData.value);
+    const data = [];
+    for (const [key, value] of searchParams.entries()) {
+      data.push({ key, value });
+    }
+    return data;
+  } catch (error) {
+    console.error('Error decoding data:', error);
+    return [];
+  }
+});
+
+const filteredDecodedData = computed(() => {
+  if (!searchTerm.value) {
+    return decodedData.value;
+  }
+  return decodedData.value.filter(item =>
+    item.key.toLowerCase().includes(searchTerm.value.toLowerCase())
+  );
+});
+</script>
+
 <style scoped>
-header {
-  line-height: 1.5;
-  max-height: 100vh;
+#app {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 2rem;
+  font-family: sans-serif;
 }
 
-.logo {
-  display: block;
-  margin: 0 auto 2rem;
-}
-
-nav {
-  width: 100%;
-  font-size: 12px;
+h1 {
   text-align: center;
-  margin-top: 2rem;
+  margin-bottom: 2rem;
 }
 
-nav a.router-link-exact-active {
-  color: var(--color-text);
+textarea {
+  width: 100%;
+  height: 150px;
+  margin-bottom: 1rem;
+  padding: 0.5rem;
+  font-size: 1rem;
 }
 
-nav a.router-link-exact-active:hover {
-  background-color: transparent;
+input {
+  width: 100%;
+  padding: 0.5rem;
+  font-size: 1rem;
+  margin-bottom: 1rem;
 }
 
-nav a {
-  display: inline-block;
-  padding: 0 1rem;
-  border-left: 1px solid var(--color-border);
+table {
+  width: 100%;
+  border-collapse: collapse;
 }
 
-nav a:first-of-type {
-  border: 0;
+th, td {
+  border: 1px solid #ddd;
+  padding: 0.5rem;
+  text-align: left;
 }
 
-@media (min-width: 1024px) {
-  header {
-    display: flex;
-    place-items: center;
-    padding-right: calc(var(--section-gap) / 2);
-  }
-
-  .logo {
-    margin: 0 2rem 0 0;
-  }
-
-  header .wrapper {
-    display: flex;
-    place-items: flex-start;
-    flex-wrap: wrap;
-  }
-
-  nav {
-    text-align: left;
-    margin-left: -1rem;
-    font-size: 1rem;
-
-    padding: 1rem 0;
-    margin-top: 1rem;
-  }
+th {
+  background-color: #f2f2f2;
 }
 </style>
